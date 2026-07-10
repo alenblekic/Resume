@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resume Intelligence Engine
 
-## Getting Started
+A free, AI-powered resume analyzer that simulates four different hiring perspectives at once — a recruiter, an ATS, a hiring manager, and a technical interviewer — and hands back a single, scannable verdict instead of a wall of generic advice.
 
-First, run the development server:
+Built as a portfolio piece with a deliberately over-the-top **cyberpunk HUD** presentation: scanlines, a particle field, a glitching title, and a cinematic "document scan" sequence while the AI works.
+
+## What it does
+
+1. **You upload a resume** (PDF, DOCX, or TXT — parsed entirely in your browser, nothing is uploaded as a raw file) and **paste a job description**.
+2. On submit, the app fires **five AI calls in parallel** against the same two inputs, each with a different persona and job:
+
+   | Persona | Judges | Returns |
+   |---|---|---|
+   | **Recruiter** | First 30-second impression | One-line verdict, strengths, red flags, overall fit |
+   | **ATS** | Keyword/requirement match | Score out of 100, missing keywords ranked critical → important, detected seniority & industry |
+   | **Hiring Manager** | Weak spots in the writing | Up to 3 weak sections, each with a one-sentence fix |
+   | **Technical Interviewer** | What they'd actually ask you | 2 technical, 2 behavioral, 1 system-design question, tailored to your resume |
+   | **Compensation model** | Market fit | Estimated salary band + probability of landing an interview, with the factors driving that number |
+
+3. Results render as a single dashboard. If one persona's call fails, that card shows a "data stream lost" state instead of taking down the whole page — you still get the other four.
+
+## How it "thinks"
+
+- All five prompts are given the **same resume + job description pair** and instructed to return structured JSON (`response_format: json_object`) so the app never has to guess at parsing free text.
+- Each persona has a narrow, single-purpose system prompt (see [lib/ai/prompts.ts](lib/ai/prompts.ts)) rather than one mega-prompt trying to do everything — this keeps each answer focused and makes a bad response from one persona isolated from the rest.
+- Calls run via `Promise.allSettled` (see [lib/ai/analysis.ts](lib/ai/analysis.ts)), so a slow or failed persona doesn't block the others.
+- Every response is validated and clamped (scores forced into 0–100, arrays capped at their intended length, missing fields defaulted) before it reaches the UI — the model's JSON is treated as untrusted input, not gospel.
+- Inference runs on [Groq](https://groq.com) (`llama-3.3-70b-versatile`), chosen for its free tier and low latency — the whole 5-call analysis typically finishes in a few seconds.
+
+## Stack
+
+- **Next.js 15** (App Router) + **TypeScript**
+- **Tailwind CSS v4** — HUD panels, corner-bracket frames, neon utility classes
+- **Framer Motion** — the scan sequence, count-up numbers, staggered card entrances, glitch bursts
+- **Zustand** — client state machine (`idle → analyzing → results | error`)
+- **groq-sdk** — AI inference
+- **pdfjs-dist** / **mammoth** — client-side PDF / DOCX text extraction (files never leave the browser as binaries; only extracted text is sent to the API)
+- **lucide-react** — icon set
+
+## Design
+
+The whole UI leans into a "hiring surveillance system" bit: a warm-charcoal background, crimson primary accent with cyan for positive signals and amber for warnings, Share Tech Mono for HUD labels, scanline + vignette overlays, and a drifting canvas particle field. The loading screen is the centerpiece — a wireframe resume gets swept by a laser while particles stream out to four persona nodes that light up one at a time with a live terminal log underneath.
+
+Everything respects `prefers-reduced-motion` (particles, glitch, and the laser scan all fall back to static equivalents) and the particle canvas pauses when the tab isn't visible.
+
+## Running it locally
+
+```bash
+npm install
+```
+
+Create `.env.local` in the project root with a free [Groq API key](https://console.groq.com):
+
+```
+GROQ_API_KEY=your_key_here
+```
+
+Then:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+app/
+├── page.tsx                  # State machine: idle → analyzing → results
+├── api/analyze/route.ts      # Single endpoint, orchestrates the 5 persona calls
+└── components/
+    ├── fx/                   # Particle field, scanlines, glitch text, typewriter, HUD frame
+    └── ...                   # Upload zone, results cards, loading scene, etc.
+lib/
+├── ai/                       # Groq client, per-persona prompts, orchestration + validation
+├── parsers/                  # Client-side PDF/DOCX/TXT text extraction
+├── store.ts                  # Zustand app state
+└── types.ts                  # Shared types for every AI response shape
+```
 
-## Learn More
+## Status
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Core analysis flow is complete and working end-to-end. Not yet built: a one-click "improve this section" rewrite feature, a language toggle, and result caching.
