@@ -1,5 +1,7 @@
 # Resume Intelligence Engine
 
+**Live demo: [resumeint-eng.vercel.app](https://resumeint-eng.vercel.app/)**
+
 A free, AI-powered resume analyzer that simulates four different hiring perspectives at once — a recruiter, an ATS, a hiring manager, and a technical interviewer — and hands back a single, scannable verdict instead of a wall of generic advice.
 
 Built as a portfolio piece with a deliberately over-the-top **cyberpunk HUD** presentation: scanlines, a particle field, a glitching title, and a cinematic "document scan" sequence while the AI works.
