@@ -18,7 +18,7 @@ export default function SmokeRingBackground() {
       className="pointer-events-none fixed inset-0 z-0 opacity-60"
     >
       <SmokeRing
-        colorBack="#171a21"
+        colorBack="#000000"
         colors={["#a78bfa", "#00e5ff"]}
         noiseScale={1.4}
         noiseIterations={6}
