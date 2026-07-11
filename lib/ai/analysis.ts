@@ -1,6 +1,7 @@
 import type {
   AnalysisResult,
   AtsResult,
+  Lang,
   HiringManagerResult,
   InterviewerResult,
   RecruiterResult,
@@ -14,6 +15,7 @@ import {
   RECRUITER_SYSTEM,
   SALARY_PROBABILITY_SYSTEM,
   buildUserPrompt,
+  withLanguage,
 } from "./prompts";
 
 const clamp = (n: number) => Math.max(0, Math.min(100, Math.round(n)));
@@ -78,17 +80,19 @@ function validateSalaryProbability(r: SalaryProbabilityResult): SalaryProbabilit
  */
 export async function runAnalysis(
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
+  language: Lang = "en"
 ): Promise<AnalysisResult> {
   const userPrompt = buildUserPrompt(resumeText, jobDescription);
+  const sys = (systemPrompt: string) => withLanguage(systemPrompt, language);
 
   const [recruiter, ats, hiringManager, interviewer, salaryProbability] =
     await Promise.allSettled([
-      completeJson<RecruiterResult>(RECRUITER_SYSTEM, userPrompt),
-      completeJson<AtsResult>(ATS_SYSTEM, userPrompt),
-      completeJson<HiringManagerResult>(HIRING_MANAGER_SYSTEM, userPrompt),
-      completeJson<InterviewerResult>(INTERVIEWER_SYSTEM, userPrompt),
-      completeJson<SalaryProbabilityResult>(SALARY_PROBABILITY_SYSTEM, userPrompt),
+      completeJson<RecruiterResult>(sys(RECRUITER_SYSTEM), userPrompt),
+      completeJson<AtsResult>(sys(ATS_SYSTEM), userPrompt),
+      completeJson<HiringManagerResult>(sys(HIRING_MANAGER_SYSTEM), userPrompt),
+      completeJson<InterviewerResult>(sys(INTERVIEWER_SYSTEM), userPrompt),
+      completeJson<SalaryProbabilityResult>(sys(SALARY_PROBABILITY_SYSTEM), userPrompt),
     ]);
 
   const settled = [recruiter, ats, hiringManager, interviewer, salaryProbability];

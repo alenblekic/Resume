@@ -1,35 +1,14 @@
 "use client";
 
 import type { PersonaId } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
-export const PERSONAS: Record<
-  PersonaId,
-  { label: string; color: string; statusLine: string; process: string }
-> = {
-  recruiter: {
-    label: "Recruiter",
-    color: "#ff3b4e",
-    statusLine: "RECRUITER.exe — first impression forming…",
-    process: "RECRUITER.exe",
-  },
-  ats: {
-    label: "ATS",
-    color: "#00e5ff",
-    statusLine: "ATS.sys — keyword sweep in progress…",
-    process: "ATS.sys",
-  },
-  hiringManager: {
-    label: "Hiring Mgr",
-    color: "#ffb300",
-    statusLine: "HIRING_MGR.exe — scrutinizing sections…",
-    process: "HIRING_MGR.exe",
-  },
-  interviewer: {
-    label: "Interviewer",
-    color: "#a78bfa",
-    statusLine: "INTERVIEWER.bin — compiling questions…",
-    process: "INTERVIEWER.bin",
-  },
+/** Language-independent persona identity — labels/status lines live in lib/i18n. */
+export const PERSONAS: Record<PersonaId, { color: string; process: string }> = {
+  recruiter: { color: "#ff3b4e", process: "RECRUITER.exe" },
+  ats: { color: "#00e5ff", process: "ATS.sys" },
+  hiringManager: { color: "#ffb300", process: "HIRING_MGR.exe" },
+  interviewer: { color: "#a78bfa", process: "INTERVIEWER.bin" },
 };
 
 /** Neon line-art HUD glyph for each persona; brightens when active. */
@@ -42,7 +21,9 @@ export default function PersonaAvatar({
   size?: number;
   active?: boolean;
 }) {
-  const { color, label } = PERSONAS[persona];
+  const t = useT();
+  const { color } = PERSONAS[persona];
+  const label = t.personas[persona].label;
   const stroke = active ? color : "rgba(236,233,236,0.25)";
 
   return (

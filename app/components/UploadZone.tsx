@@ -4,23 +4,26 @@ import { useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Crosshair, FileText, X } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { extractText, ParseError } from "@/lib/parsers/extract-text";
+import { useT } from "@/lib/i18n";
+import { extractText, ParseError, type ParseErrorCode } from "@/lib/parsers/extract-text";
 import HudFrame from "./fx/HudFrame";
 
 export default function UploadZone() {
   const { resumeText, resumeFileName, setResume, clearResume } = useAppStore();
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
   const reduced = useReducedMotion();
   const [dragging, setDragging] = useState(false);
   const [parsing, setParsing] = useState(false);
   const [scanned, setScanned] = useState(false);
-  const [parseError, setParseError] = useState("");
+  // the code (not the message) is stored so the text re-localizes on toggle
+  const [parseError, setParseError] = useState<ParseErrorCode | "generic" | null>(null);
   const [showPasteFallback, setShowPasteFallback] = useState(false);
   const [pastedText, setPastedText] = useState("");
 
   async function handleFile(file: File) {
     setParsing(true);
-    setParseError("");
+    setParseError(null);
     setScanned(false);
     try {
       const text = await extractText(file);
@@ -29,9 +32,7 @@ export default function UploadZone() {
       setScanned(true);
     } catch (err) {
       clearResume();
-      setParseError(
-        err instanceof ParseError ? err.message : "Could not read this file."
-      );
+      setParseError(err instanceof ParseError ? err.code : "generic");
       setShowPasteFallback(true);
     } finally {
       setParsing(false);
@@ -52,13 +53,13 @@ export default function UploadZone() {
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="hud-label text-xs text-accent/70">▸ Subject document</span>
+      <span className="hud-label text-xs text-accent/70">{t.upload.label}</span>
 
       <HudFrame>
         <div
           role="button"
           tabIndex={0}
-          aria-label="Upload resume — PDF, DOCX, or TXT"
+          aria-label={t.upload.uploadAria}
           onClick={() => !parsing && inputRef.current?.click()}
           onKeyDown={(e) => {
             if ((e.key === "Enter" || e.key === " ") && !parsing) {
@@ -114,12 +115,12 @@ export default function UploadZone() {
 
           {parsing ? (
             <p className="hud-label text-sm text-cyan animate-pulse">
-              Ingesting document…
+              {t.upload.parsing}
             </p>
           ) : dragging ? (
             <div className="flex flex-col items-center gap-2">
               <Crosshair className="w-8 h-8 text-accent" strokeWidth={1.5} />
-              <p className="hud-label text-sm accent-text">Target acquired — release</p>
+              <p className="hud-label text-sm accent-text">{t.upload.dropRelease}</p>
             </div>
           ) : hasResume ? (
             <div className="flex items-center justify-center gap-3 flex-wrap">
@@ -127,11 +128,11 @@ export default function UploadZone() {
               <span className="text-sm text-accent">
                 &gt; {resumeFileName}{" "}
                 <span className="text-foreground/50">
-                  {`// ${lineCount} LINES INGESTED`}
+                  {t.upload.linesIngested(lineCount)}
                 </span>
               </span>
               <button
-                aria-label="Remove resume"
+                aria-label={t.upload.remove}
                 onClick={(e) => {
                   e.stopPropagation();
                   clearResume();
@@ -149,10 +150,10 @@ export default function UploadZone() {
                 strokeWidth={1.25}
               />
               <p className="hud-label text-sm text-foreground/90">
-                Drop resume into scanner
+                {t.upload.dropTitle}
               </p>
               <p className="text-xs text-foreground/40 mt-1.5">
-                or click to browse — PDF / DOCX / TXT
+                {t.upload.dropHint}
               </p>
             </>
           )}
@@ -161,7 +162,10 @@ export default function UploadZone() {
 
       {parseError && (
         <p className="text-xs text-warn">
-          <span className="hud-label">⚠ Parse fault:</span> {parseError}
+          <span className="hud-label">{t.upload.parseFault}</span>{" "}
+          {parseError === "generic"
+            ? t.upload.genericParseError
+            : t.upload.parseErrors[parseError]}
         </p>
       )}
 
@@ -169,9 +173,9 @@ export default function UploadZone() {
         <textarea
           value={pastedText}
           onChange={(e) => handlePaste(e.target.value)}
-          placeholder="$ paste_resume_text_here"
+          placeholder={t.upload.pastePlaceholder}
           rows={8}
-          aria-label="Paste resume text"
+          aria-label={t.upload.pasteAria}
           className="hud-panel p-4 text-sm text-foreground placeholder:text-foreground/25 focus:outline-none focus:border-accent resize-y bg-transparent"
         />
       )}

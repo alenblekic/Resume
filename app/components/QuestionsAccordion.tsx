@@ -3,35 +3,33 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { InterviewerResult } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
-const TABS = [
-  { id: "technical", label: "Technical" },
-  { id: "behavioral", label: "Behavioral" },
-  { id: "system_design", label: "Sys Design" },
-] as const;
+const TAB_IDS = ["technical", "behavioral", "system_design"] as const;
 
-type TabId = (typeof TABS)[number]["id"];
+type TabId = (typeof TAB_IDS)[number];
 
 export default function QuestionsAccordion({ data }: { data: InterviewerResult }) {
   const [activeTab, setActiveTab] = useState<TabId>("technical");
+  const t = useT();
   const questions = data[activeTab];
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex border border-accent/20">
-        {TABS.map((tab) => (
+        {TAB_IDS.map((tabId) => (
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            key={tabId}
+            onClick={() => setActiveTab(tabId)}
             className={`hud-label relative flex-1 cursor-pointer px-2 py-2 text-[10px] transition-colors duration-200 ${
-              activeTab === tab.id
+              activeTab === tabId
                 ? "text-accent"
                 : "text-foreground/40 hover:text-foreground/70"
             }`}
-            aria-pressed={activeTab === tab.id}
+            aria-pressed={activeTab === tabId}
           >
-            {tab.label}
-            {activeTab === tab.id && (
+            {t.questions.tabs[tabId]}
+            {activeTab === tabId && (
               <motion.span
                 layoutId="question-tab-beam"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent"
@@ -53,7 +51,7 @@ export default function QuestionsAccordion({ data }: { data: InterviewerResult }
           transition={{ duration: 0.2 }}
         >
           {questions.length === 0 ? (
-            <li className="text-xs text-foreground/40">No questions generated.</li>
+            <li className="text-xs text-foreground/40">{t.questions.empty}</li>
           ) : (
             questions.map((q, i) => (
               <li key={i} className="flex gap-2.5 text-xs text-foreground/80 leading-relaxed">

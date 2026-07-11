@@ -12,6 +12,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
+import { useT } from "@/lib/i18n";
 import ResultCard from "./ResultCard";
 import ScoreRing from "./ScoreRing";
 import KeywordsList from "./KeywordsList";
@@ -22,6 +23,7 @@ import ProbabilityMeter from "./ProbabilityMeter";
 
 export default function ResultsDashboard() {
   const { results, reset } = useAppStore();
+  const t = useT();
   if (!results) return null;
 
   const { recruiter, ats, hiringManager, interviewer, salaryProbability } = results;
@@ -35,7 +37,7 @@ export default function ResultsDashboard() {
     >
       <div className="flex items-center justify-between flex-wrap gap-3">
         <h1 className="hud-label text-lg sm:text-xl accent-text">
-          {"// Analysis complete"}
+          {t.results.complete}
         </h1>
         <div className="flex items-center gap-3 flex-wrap">
           {ats && (
@@ -52,7 +54,7 @@ export default function ResultsDashboard() {
             onClick={reset}
             className="hud-label cursor-pointer border border-foreground/25 text-foreground/70 hover:border-accent hover:text-accent text-[11px] px-4 py-2.5 transition-colors"
           >
-            ▸ New scan
+            {t.results.newScan}
           </button>
         </div>
       </div>
@@ -66,7 +68,7 @@ export default function ResultsDashboard() {
         initial="hidden"
         animate="visible"
       >
-        <ResultCard title="ATS Score" icon={Radar} failed={!ats}>
+        <ResultCard title={t.results.atsScore} icon={Radar} failed={!ats}>
           {ats && (
             <div className="flex flex-col items-center gap-2">
               <ScoreRing score={ats.score} />
@@ -75,13 +77,13 @@ export default function ResultsDashboard() {
                   ats.score >= 70 ? "text-cyan" : "text-warn"
                 }`}
               >
-                [ STATUS: {ats.score >= 70 ? "GOOD" : "NEEDS WORK"} ]
+                [ {ats.score >= 70 ? t.results.statusGood : t.results.statusNeedsWork} ]
               </span>
             </div>
           )}
         </ResultCard>
 
-        <ResultCard title="Recruiter First Pass" icon={Eye} failed={!recruiter}>
+        <ResultCard title={t.results.recruiterPass} icon={Eye} failed={!recruiter}>
           {recruiter && (
             <div className="flex flex-col gap-3">
               <p className="text-sm text-foreground/95">
@@ -103,20 +105,24 @@ export default function ResultsDashboard() {
           )}
         </ResultCard>
 
-        <ResultCard title="Missing Keywords" icon={KeyRound} failed={!ats}>
+        <ResultCard title={t.results.missingKeywords} icon={KeyRound} failed={!ats}>
           {ats && <KeywordsList keywords={ats.missing_keywords} />}
         </ResultCard>
 
-        <ResultCard title="Weak Sections" icon={Wrench} failed={!hiringManager}>
+        <ResultCard title={t.results.weakSections} icon={Wrench} failed={!hiringManager}>
           {hiringManager && <WeakSections sections={hiringManager.weak_sections} />}
         </ResultCard>
 
-        <ResultCard title="Salary Estimate" icon={Banknote} failed={!salaryProbability}>
+        <ResultCard
+          title={t.results.salaryEstimate}
+          icon={Banknote}
+          failed={!salaryProbability}
+        >
           {salaryProbability && <SalaryWidget data={salaryProbability} />}
         </ResultCard>
 
         <ResultCard
-          title="Interview Questions"
+          title={t.results.interviewQuestions}
           icon={MessagesSquare}
           failed={!interviewer}
         >
@@ -124,7 +130,7 @@ export default function ResultsDashboard() {
         </ResultCard>
 
         <ResultCard
-          title="Interview Probability"
+          title={t.results.interviewProbability}
           icon={TrendingUp}
           failed={!salaryProbability}
           className="md:col-span-2 lg:col-span-3"
@@ -135,7 +141,7 @@ export default function ResultsDashboard() {
 
       <p className="hud-label text-center text-[9px] text-foreground/25 flex items-center justify-center gap-2">
         <ScanLine className="w-3 h-3" strokeWidth={1.5} />
-        Scan complete — no data retained
+        {t.results.footer}
       </p>
     </motion.div>
   );

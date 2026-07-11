@@ -56,4 +56,6 @@ export interface AnalysisResult {
 
 export type AppState = "idle" | "analyzing" | "results" | "error";
 
+export type Lang = "en" | "sv";
+
 export type PersonaId = "recruiter" | "ats" | "hiringManager" | "interviewer";

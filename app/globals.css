@@ -51,16 +51,12 @@ body {
 
 .accent-text {
   color: var(--accent);
-  text-shadow:
-    0 0 6px rgba(255, 59, 78, 0.6),
-    0 0 24px rgba(255, 59, 78, 0.25);
+  text-shadow: 0 0 10px rgba(255, 59, 78, 0.3);
 }
 
 .cyan-text {
   color: var(--cyan);
-  text-shadow:
-    0 0 6px rgba(0, 229, 255, 0.6),
-    0 0 24px rgba(0, 229, 255, 0.25);
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.3);
 }
 
 .hud-panel {

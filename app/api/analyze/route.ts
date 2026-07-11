@@ -7,7 +7,7 @@ export const maxDuration = 60;
 const MAX_CHARS = 30_000;
 
 export async function POST(req: NextRequest) {
-  let body: { resumeText?: string; jobDescription?: string };
+  let body: { resumeText?: string; jobDescription?: string; language?: string };
   try {
     body = await req.json();
   } catch {
@@ -16,6 +16,7 @@ export async function POST(req: NextRequest) {
 
   const resumeText = body.resumeText?.trim() ?? "";
   const jobDescription = body.jobDescription?.trim() ?? "";
+  const language = body.language === "sv" ? "sv" : "en";
 
   if (!resumeText || !jobDescription) {
     return NextResponse.json(
@@ -27,7 +28,8 @@ export async function POST(req: NextRequest) {
   try {
     const results = await runAnalysis(
       resumeText.slice(0, MAX_CHARS),
-      jobDescription.slice(0, MAX_CHARS)
+      jobDescription.slice(0, MAX_CHARS),
+      language
     );
     return NextResponse.json(results);
   } catch (err) {

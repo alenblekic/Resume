@@ -2,13 +2,16 @@
 
 import { Check } from "lucide-react";
 import type { WeakSection } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 export default function WeakSections({ sections }: { sections: WeakSection[] }) {
+  const t = useT();
+
   if (sections.length === 0) {
     return (
       <p className="flex items-center gap-2 text-xs text-cyan">
         <Check className="w-4 h-4" strokeWidth={2} />
-        No weak sections detected — document integrity high.
+        {t.weak.empty}
       </p>
     );
   }
@@ -23,7 +26,7 @@ export default function WeakSections({ sections }: { sections: WeakSection[] }) 
           </p>
           <p className="text-xs text-foreground/50 mt-1">{s.issue}</p>
           <p className="text-xs text-cyan/90 mt-1">
-            <span className="hud-label">&gt;&gt; Fix:</span> {s.fix}
+            <span className="hud-label">{t.weak.fix}</span> {s.fix}
           </p>
         </li>
       ))}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { PersonaId } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 import PersonaAvatar, { PERSONAS } from "./PersonaAvatar";
 import TypeWriter from "./fx/TypeWriter";
 
@@ -19,13 +20,8 @@ const NODE_POS: Record<PersonaId, { x: number; y: number }> = {
 const DOC = { x: 250, y: 130, w: 140, h: 200 };
 const DOC_CENTER = { x: DOC.x + DOC.w / 2, y: DOC.y + DOC.h / 2 };
 
-const LOG_EXTRAS = [
-  "> cross-referencing job requirements…",
-  "> salary band estimation running…",
-  "> probability matrix computing…",
-];
-
 export default function LoadingScreen() {
+  const t = useT();
   const reduced = useReducedMotion();
   const [activeCount, setActiveCount] = useState(0);
   const [logIndex, setLogIndex] = useState(0);
@@ -40,8 +36,8 @@ export default function LoadingScreen() {
 
   // rotate terminal log lines
   const logLines = [
-    ...PERSONA_IDS.map((id) => `> ${PERSONAS[id].statusLine}`),
-    ...LOG_EXTRAS,
+    ...PERSONA_IDS.map((id) => `> ${t.personas[id].statusLine}`),
+    ...t.loading.extras,
   ];
   useEffect(() => {
     const interval = setInterval(() => {
@@ -66,7 +62,7 @@ export default function LoadingScreen() {
             <div key={id} className="flex flex-col items-center gap-2">
               <PersonaAvatar persona={id} active={activeIds.includes(id)} />
               <span className="hud-label text-[10px] text-foreground/60">
-                {PERSONAS[id].label}
+                {t.personas[id].label}
               </span>
             </div>
           ))}
@@ -83,15 +79,13 @@ export default function LoadingScreen() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <p className="hud-label text-[10px] text-accent/50">
-        ┌ document processing in progress ┐
-      </p>
+      <p className="hud-label text-[10px] text-accent/50">{t.loading.header}</p>
 
       <svg
         viewBox="0 0 640 460"
         className="w-full max-w-[640px]"
         role="img"
-        aria-label="Analyzing your resume: four AI personas processing the document"
+        aria-label={t.loading.aria}
       >
         <defs>
           <linearGradient id="laser" x1="0" y1="0" x2="0" y2="1">

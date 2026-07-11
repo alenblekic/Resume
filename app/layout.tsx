@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Share_Tech_Mono, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import Scanlines from "./components/fx/Scanlines";
-import ParticleField from "./components/fx/ParticleField";
+import SmokeRingBackground from "./components/fx/SmokeRingBackground";
 
 const shareTech = Share_Tech_Mono({
   variable: "--font-share-tech",
@@ -33,7 +33,7 @@ export default function RootLayout({
       className={`${shareTech.variable} ${plexMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ParticleField />
+        <SmokeRingBackground />
         <div className="relative z-10 flex-1 flex flex-col">{children}</div>
         <Scanlines />
       </body>

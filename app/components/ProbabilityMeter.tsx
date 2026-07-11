@@ -3,21 +3,23 @@
 import { motion } from "framer-motion";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import type { SalaryProbabilityResult } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 import ScoreRing from "./ScoreRing";
 
 export default function ProbabilityMeter({ data }: { data: SalaryProbabilityResult }) {
   const { probability, probability_factors } = data;
+  const t = useT();
 
   return (
     <div className="flex flex-col sm:flex-row items-center gap-8">
-      <ScoreRing score={probability} size={120} label="Interview odds" />
+      <ScoreRing score={probability} size={120} label={t.probability.odds} />
 
       <div className="flex-1 flex flex-col gap-4 w-full">
         {probability_factors.positive.length > 0 && (
           <div>
             <p className="hud-label flex items-center gap-1.5 text-[10px] text-cyan/80 mb-1.5">
               <TrendingUp className="w-3.5 h-3.5" strokeWidth={2} />
-              Signal boost
+              {t.probability.boost}
             </p>
             <ul className="flex flex-col gap-1">
               {probability_factors.positive.map((f, i) => (
@@ -38,7 +40,7 @@ export default function ProbabilityMeter({ data }: { data: SalaryProbabilityResu
           <div>
             <p className="hud-label flex items-center gap-1.5 text-[10px] text-accent/80 mb-1.5">
               <TrendingDown className="w-3.5 h-3.5" strokeWidth={2} />
-              Signal drag
+              {t.probability.drag}
             </p>
             <ul className="flex flex-col gap-1">
               {probability_factors.negative.map((f, i) => (

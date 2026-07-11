@@ -4,15 +4,17 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown } from "lucide-react";
 import type { MissingKeyword } from "@/lib/types";
+import { useT } from "@/lib/i18n";
 
 export default function KeywordsList({ keywords }: { keywords: MissingKeyword[] }) {
   const [expanded, setExpanded] = useState<string | null>(null);
+  const t = useT();
 
   if (keywords.length === 0) {
     return (
       <p className="flex items-center gap-2 text-xs text-cyan">
         <Check className="w-4 h-4" strokeWidth={2} />
-        No critical keywords missing — full coverage.
+        {t.keywords.empty}
       </p>
     );
   }
@@ -46,7 +48,7 @@ export default function KeywordsList({ keywords }: { keywords: MissingKeyword[] 
                   [ {k.keyword} ]
                 </span>
                 <span className="hud-label text-[9px] text-foreground/30">
-                  {k.importance}
+                  {t.keywords.importance[k.importance]}
                 </span>
                 <ChevronDown
                   className={`ml-auto w-3.5 h-3.5 text-foreground/30 group-hover:text-foreground/60 transition-transform duration-200 ${
@@ -64,7 +66,7 @@ export default function KeywordsList({ keywords }: { keywords: MissingKeyword[] 
                   animate={{ height: "auto", opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
                 >
-                  <span className="text-cyan">&gt;&gt; FIX:</span> {k.suggestion}
+                  <span className="text-cyan">{t.keywords.fix}</span> {k.suggestion}
                 </motion.p>
               )}
             </AnimatePresence>

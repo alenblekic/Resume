@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { AlertTriangle, type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { useT } from "@/lib/i18n";
 import HudFrame from "./fx/HudFrame";
 
 interface ResultCardProps {
@@ -22,6 +23,7 @@ export default function ResultCard({
   className = "",
 }: ResultCardProps) {
   const reduced = useReducedMotion();
+  const t = useT();
 
   return (
     <motion.div
@@ -44,7 +46,7 @@ export default function ResultCard({
         {failed ? (
           <p className="flex items-center gap-2 text-xs text-warn">
             <AlertTriangle className="w-4 h-4 shrink-0" strokeWidth={1.5} />
-            <span className="hud-label">Data stream lost</span> — re-run analysis.
+            <span className="hud-label">{t.card.dataLost}</span> {t.card.rerun}
           </p>
         ) : (
           children

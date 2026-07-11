@@ -1,3 +1,5 @@
+import type { Lang } from "../types";
+
 const JSON_RULES =
   "Respond with valid JSON only, exactly matching the schema. Be concise and specific — no generic advice.";
 
@@ -54,4 +56,12 @@ Schema:
 
 export function buildUserPrompt(resumeText: string, jobDescription: string): string {
   return `RESUME:\n${resumeText}\n\nJOB DESCRIPTION:\n${jobDescription}`;
+}
+
+const SWEDISH_RULE =
+  'Write every human-readable string value in Swedish (svenska). Keep all JSON keys exactly as specified in the schema, and keep enum values ("importance" and "salary_currency") in English exactly as listed.';
+
+/** Appends the output-language instruction to a persona system prompt. */
+export function withLanguage(systemPrompt: string, lang: Lang): string {
+  return lang === "sv" ? `${systemPrompt}\n${SWEDISH_RULE}` : systemPrompt;
 }
