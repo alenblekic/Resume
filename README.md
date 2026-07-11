@@ -4,7 +4,7 @@
 
 A free, AI-powered resume analyzer that simulates four different hiring perspectives at once — a recruiter, an ATS, a hiring manager, and a technical interviewer — and hands back a single, scannable verdict instead of a wall of generic advice.
 
-Built as a portfolio piece with a deliberately over-the-top **cyberpunk HUD** presentation: scanlines, a particle field, a glitching title, and a cinematic "document scan" sequence while the AI works.
+Built as a portfolio piece with a deliberately over-the-top **cyberpunk HUD** presentation: a drifting smoke-ring shader backdrop, a glitching title, and a cinematic "document scan" sequence while the AI works.
 
 ## What it does
 
@@ -21,6 +21,10 @@ Built as a portfolio piece with a deliberately over-the-top **cyberpunk HUD** pr
 
 3. Results render as a single dashboard. If one persona's call fails, that card shows a "data stream lost" state instead of taking down the whole page — you still get the other four.
 
+## Language
+
+An **EN / SV** toggle in the header switches the entire interface — and the AI's own output — between English and Swedish. Flip it before running an analysis and all five personas write their verdict, feedback, and questions in Swedish instead of English; results already on screen stay in whichever language they were generated in. The choice is remembered locally between visits.
+
 ## How it "thinks"
 
 - All five prompts are given the **same resume + job description pair** and instructed to return structured JSON (`response_format: json_object`) so the app never has to guess at parsing free text.
@@ -31,7 +35,7 @@ Built as a portfolio piece with a deliberately over-the-top **cyberpunk HUD** pr
 
 ## Stack
 
-- **Next.js 15** (App Router) + **TypeScript**
+- **Next.js 16** (App Router) + **TypeScript**
 - **Tailwind CSS v4** — HUD panels, corner-bracket frames, neon utility classes
 - **Framer Motion** — the scan sequence, count-up numbers, staggered card entrances, glitch bursts
 - **Zustand** — client state machine (`idle → analyzing → results | error`)
@@ -41,9 +45,9 @@ Built as a portfolio piece with a deliberately over-the-top **cyberpunk HUD** pr
 
 ## Design
 
-The whole UI leans into a "hiring surveillance system" bit: a warm-charcoal background, crimson primary accent with cyan for positive signals and amber for warnings, Share Tech Mono for HUD labels, scanline + vignette overlays, and a drifting canvas particle field. The loading screen is the centerpiece — a wireframe resume gets swept by a laser while particles stream out to four persona nodes that light up one at a time with a live terminal log underneath.
+The whole UI leans into a "hiring surveillance system" bit: a warm-charcoal background, crimson primary accent with cyan for positive signals and amber for warnings, Share Tech Mono for HUD labels, a soft vignette overlay, and an ambient violet/cyan smoke-ring shader drifting behind the content. The loading screen is the centerpiece — a wireframe resume gets swept by a laser while particles stream out to four persona nodes that light up one at a time with a live terminal log underneath.
 
-Everything respects `prefers-reduced-motion` (particles, glitch, and the laser scan all fall back to static equivalents) and the particle canvas pauses when the tab isn't visible.
+Everything respects `prefers-reduced-motion` (the shader background, glitch, and the laser scan all fall back to static equivalents).
 
 ## Running it locally
 
@@ -72,15 +76,16 @@ app/
 ├── page.tsx                  # State machine: idle → analyzing → results
 ├── api/analyze/route.ts      # Single endpoint, orchestrates the 5 persona calls
 └── components/
-    ├── fx/                   # Particle field, scanlines, glitch text, typewriter, HUD frame
-    └── ...                   # Upload zone, results cards, loading scene, etc.
+    ├── fx/                   # Smoke-ring shader background, scanlines, glitch text, typewriter, HUD frame
+    └── ...                   # Upload zone, results cards, loading scene, language toggle, etc.
 lib/
 ├── ai/                       # Groq client, per-persona prompts, orchestration + validation
 ├── parsers/                  # Client-side PDF/DOCX/TXT text extraction
+├── i18n.ts                   # English/Swedish UI dictionary
 ├── store.ts                  # Zustand app state
 └── types.ts                  # Shared types for every AI response shape
 ```
 
 ## Status
 
-Core analysis flow is complete and working end-to-end. Not yet built: a one-click "improve this section" rewrite feature, a language toggle, and result caching.
+Core analysis flow is complete and working end-to-end. Not yet built: a one-click "improve this section" rewrite feature and result caching.
