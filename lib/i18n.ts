@@ -8,6 +8,10 @@ const en = {
       "> 4 AI hiring personas will process your document: recruiter // ATS // hiring manager // interviewer",
     analyze: "Initiate analysis",
     genericError: "Something went wrong analyzing your resume. Please try again.",
+    serverErrors: {
+      rate_limited: "The AI service is busy right now — please try again in a minute.",
+      ai_unavailable: "AI service temporarily unavailable. Please try again in a few minutes.",
+    },
     faultTitle: "System fault",
     reboot: "▸ Reboot session",
   },
@@ -115,6 +119,10 @@ const sv: Dict = {
       "> 4 AI-rekryteringspersonas kommer att bearbeta ditt dokument: rekryterare // ATS // rekryterande chef // intervjuare",
     analyze: "Initiera analys",
     genericError: "Något gick fel vid analysen av ditt CV. Försök igen.",
+    serverErrors: {
+      rate_limited: "AI-tjänsten är upptagen just nu — försök igen om en minut.",
+      ai_unavailable: "AI-tjänsten är tillfälligt otillgänglig. Försök igen om några minuter.",
+    },
     faultTitle: "Systemfel",
     reboot: "▸ Starta om sessionen",
   },

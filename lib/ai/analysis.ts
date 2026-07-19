@@ -73,10 +73,14 @@ function validateSalaryProbability(r: SalaryProbabilityResult): SalaryProbabilit
   };
 }
 
+// spreads the persona launches so their first attempts (and any rate-limit
+// retries) don't hit the tokens-per-minute window at the same instant
+const STAGGER_MS = 400;
+
 /**
  * Runs all 5 persona analyses in parallel. A failed persona yields null so
- * the UI can render partial results — unless EVERY call failed, or we hit a
- * rate limit, which are surfaced as errors.
+ * the UI can render partial results — only when EVERY call failed is an
+ * error surfaced (as RateLimitError if any failure was a rate limit).
  */
 export async function runAnalysis(
   resumeText: string,
@@ -88,19 +92,23 @@ export async function runAnalysis(
 
   const [recruiter, ats, hiringManager, interviewer, salaryProbability] =
     await Promise.allSettled([
-      completeJson<RecruiterResult>(sys(RECRUITER_SYSTEM), userPrompt),
-      completeJson<AtsResult>(sys(ATS_SYSTEM), userPrompt),
-      completeJson<HiringManagerResult>(sys(HIRING_MANAGER_SYSTEM), userPrompt),
-      completeJson<InterviewerResult>(sys(INTERVIEWER_SYSTEM), userPrompt),
-      completeJson<SalaryProbabilityResult>(sys(SALARY_PROBABILITY_SYSTEM), userPrompt),
+      completeJson<RecruiterResult>(sys(RECRUITER_SYSTEM), userPrompt, 0 * STAGGER_MS),
+      completeJson<AtsResult>(sys(ATS_SYSTEM), userPrompt, 1 * STAGGER_MS),
+      completeJson<HiringManagerResult>(sys(HIRING_MANAGER_SYSTEM), userPrompt, 2 * STAGGER_MS),
+      completeJson<InterviewerResult>(sys(INTERVIEWER_SYSTEM), userPrompt, 3 * STAGGER_MS),
+      completeJson<SalaryProbabilityResult>(
+        sys(SALARY_PROBABILITY_SYSTEM),
+        userPrompt,
+        4 * STAGGER_MS
+      ),
     ]);
 
   const settled = [recruiter, ats, hiringManager, interviewer, salaryProbability];
 
-  if (settled.some((s) => s.status === "rejected" && s.reason instanceof RateLimitError)) {
-    throw new RateLimitError();
-  }
   if (settled.every((s) => s.status === "rejected")) {
+    if (settled.some((s) => (s as PromiseRejectedResult).reason instanceof RateLimitError)) {
+      throw new RateLimitError();
+    }
     throw (settled[0] as PromiseRejectedResult).reason;
   }
 

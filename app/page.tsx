@@ -40,7 +40,11 @@ export default function Home() {
       });
       if (!res.ok) {
         const data = await res.json().catch(() => null);
-        throw new Error(data?.error ?? t.home.genericError);
+        const localized =
+          data?.code && data.code in t.home.serverErrors
+            ? t.home.serverErrors[data.code as keyof typeof t.home.serverErrors]
+            : undefined;
+        throw new Error(localized ?? data?.error ?? t.home.genericError);
       }
       const results: AnalysisResult = await res.json();
       setResults(results);

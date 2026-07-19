@@ -35,13 +35,19 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     if (err instanceof RateLimitError) {
       return NextResponse.json(
-        { error: "The AI service is busy right now — please try again in a minute." },
+        {
+          error: "The AI service is busy right now — please try again in a minute.",
+          code: "rate_limited",
+        },
         { status: 503 }
       );
     }
     console.error("Analysis failed:", err);
     return NextResponse.json(
-      { error: "AI service temporarily unavailable. Please try again in a few minutes." },
+      {
+        error: "AI service temporarily unavailable. Please try again in a few minutes.",
+        code: "ai_unavailable",
+      },
       { status: 503 }
     );
   }
